@@ -1,40 +1,39 @@
 import os
 import sys
 
-def parse_scores_from_string(s):
-    parts = [p.strip() for p in s.replace(',', ' ').split()]
-    scores = []
-    for p in parts:
-        if p == ":":
-            continue
+def parse(s):
+    nums = []
+    for x in s.replace(",", " ").split():
         try:
-            scores.append(float(p))
+            nums.append(float(x))
         except ValueError:
-            print(f"warning: skipping non-numeric token: {p}")
-    return scores
+            print(f"warning: skipping non-numeric token: {x}")
+    return nums
 
 def read_scores():
     if len(sys.argv) > 1:
-        return parse_scores_from_string(" ".join(sys.argv[1:]))
-    env = os.getenv("SCORES")
-    if env:
-        return parse_scores_from_string(env)
+        return parse(" ".join(sys.argv[1:]))
+
+    if os.getenv("SCORES"):
+        return parse(os.getenv("SCORES"))
+
     if os.path.isfile("scores.txt"):
-        with open("scores.txt", "r") as f:
-            return parse_scores_from_string(f.read())
-    raw = input("Enter scores separated by spaces or commas: ")
-    return parse_scores_from_string(raw)
+        with open("scores.txt") as f:
+            return parse(f.read())
+
+    return parse(input("Enter scores separated by spaces or commas: "))
 
 def main():
     scores = read_scores()
     if not scores:
         print("No valid scores provided.")
         sys.exit(1)
-    total = sum(scores)
-    avg = total / len(scores)
 
     print("=== main/master branch output ===")
     print(f"Count of scores: {len(scores)}")
-    print(f"Sum: {total}")
-    print(f"Average: {avg}")
-  
+    print(f"Sum: {sum(scores)}")
+    print(f"Average: {sum(scores) / len(scores)}")
+
+
+if __name__ == "__main__":
+    main()
